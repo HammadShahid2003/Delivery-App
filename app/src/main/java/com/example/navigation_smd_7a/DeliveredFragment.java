@@ -1,12 +1,18 @@
 package com.example.navigation_smd_7a;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,7 +29,7 @@ public class DeliveredFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    Context context;
     public DeliveredFragment() {
         // Required empty public constructor
     }
@@ -45,6 +51,11 @@ public class DeliveredFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,4 +72,23 @@ public class DeliveredFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_delivered, container, false);
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ListView lvNewOrderList = view.findViewById(R.id.lvNewOrdersList);
+        ProductDB productDB = new ProductDB(context);
+        productDB.open();
+        ArrayList<Product> products = productDB.fetchProducts();
+
+        productDB.close();
+        ArrayList<Product> new_orders= new ArrayList<>();
+        for(int i=0;i<products.size();i++){
+            if(products.get(i).getStatus().equals("delivered")){
+                new_orders.add(products.get(i));
+            }
+        }
+        ProductAdapter adapter = new ProductAdapter(context, R.layout.product_item_design, new_orders);
+        lvNewOrderList.setAdapter(adapter);
+    }
+
 }

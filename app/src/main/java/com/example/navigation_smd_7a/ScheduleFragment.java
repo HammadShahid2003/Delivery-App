@@ -1,12 +1,19 @@
 package com.example.navigation_smd_7a;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,7 +21,7 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ScheduleFragment extends Fragment {
-
+  Context context;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -23,7 +30,10 @@ public class ScheduleFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
     public ScheduleFragment() {
         // Required empty public constructor
     }
@@ -59,6 +69,30 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d("ScheduleFragment", "onCreateView called");
         return inflater.inflate(R.layout.fragment_schedule, container, false);
+
+
+
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ListView lvNewOrderList = view.findViewById(R.id.lvscheduledOrders);
+        ProductDB productDB = new ProductDB(context);
+        productDB.open();
+        ArrayList<Product> products = productDB.fetchProducts();
+
+        productDB.close();
+        ArrayList<Product> schedule_orders= new ArrayList<>();
+        for(int i=0;i<products.size();i++){
+            if(products.get(i).getStatus().equals("schedule")){
+                schedule_orders.add(products.get(i));
+            }
+        }
+
+
+        ProductAdapter adapter = new ProductAdapter(context, R.layout.product_item_design,schedule_orders);
+        lvNewOrderList.setAdapter(adapter);
     }
 }

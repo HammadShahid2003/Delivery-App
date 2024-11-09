@@ -2,6 +2,7 @@ package com.example.navigation_smd_7a;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -14,12 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        adapter = new ViewPagerAdapter(this);
+
+        adapter = new ViewPagerAdapter(MainActivity.this);
         vp2 = findViewById(R.id.viewpager2);
         vp2.setAdapter(adapter);
+
         tabLayout = findViewById(R.id.tabLayout);
         fab_add = findViewById(R.id.fab_add);
 
@@ -65,25 +71,30 @@ public class MainActivity extends AppCompatActivity {
                         String title = etTitle.getText().toString().trim();
                         String date = etDate.getText().toString().trim();
                         String price = etPrice.getText().toString();
-
+                        if(title.isEmpty() || date.isEmpty() || price.isEmpty()){
+                            Toast.makeText(MainActivity.this,"Please Enter full Information",Toast.LENGTH_LONG).show();
+                        }
+                        else{
                         ProductDB productDB = new ProductDB(MainActivity.this);
                         productDB.open();
                         productDB.insert(title, date, Integer.parseInt(price));
                         productDB.close();
                         Toast.makeText(MainActivity.this, "Product Added", Toast.LENGTH_SHORT).show();
-
+                            adapter.notifyDataSetChanged();
+                        dialogInterface.dismiss();
+                        }
                     }
                 });
 
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
+                    public void onClick(DialogInterface dialogInterface, int i) {dialogInterface.dismiss();
                     }
                 });
 
-
+            dialog.show();
             }
+
         });
 
 
@@ -97,9 +108,21 @@ public class MainActivity extends AppCompatActivity {
                                 tab.setText("Scheduled");
                                 tab.setIcon(R.drawable.schedule_icon);
                                 BadgeDrawable badgeDrawable = tab.getOrCreateBadge();
-                                badgeDrawable.setNumber(count);
+
+                                ProductDB db=new ProductDB(MainActivity.this);
+                                db.open();
+                                ArrayList<Product> prod=db.fetchProducts();
+                                if(prod!=null){
+                                badgeDrawable.setNumber(prod.size());
                                 badgeDrawable.setMaxCharacterCount(2);
-                                badgeDrawable.setVisible(true);
+                                badgeDrawable.setVisible(true);}
+                                else{
+                                    badgeDrawable.setNumber(0);
+                                    badgeDrawable.setMaxCharacterCount(2);
+                                    badgeDrawable.setVisible(true);
+
+                                }
+                                db.close();
                                 break;
                             case 1:
                                 tab.setText("Delivered");
@@ -111,31 +134,32 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
         tabLayoutMediator.attach();
 
-        vp2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                TabLayout.Tab selectedTab = tabLayout.getTabAt(position);
-//                count++;
-                BadgeDrawable badgeDrawable = selectedTab.getBadge();
-                if(badgeDrawable != null)
-                {
-                    count=0;
-                    badgeDrawable.setNumber(count);
-                    if(!flag)
-                        flag=true;
-                    else
-                        badgeDrawable.setVisible(false);
-                }
-
-
-//                   badgeDrawable.setNumber(count);
-
-
-            }
-        });
+//        vp2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                super.onPageSelected(position);
+//                TabLayout.Tab selectedTab = tabLayout.getTabAt(position);
+////                count++;
+//                BadgeDrawable badgeDrawable = selectedTab.getBadge();
+//                if(badgeDrawable != null)
+//                {
+//                    count=0;
+//                    badgeDrawable.setNumber(count);
+//                    if(!flag)
+//                        flag=true;
+//                    else
+//                        badgeDrawable.setVisible(false);
+//                }
+//
+//
+////                   badgeDrawable.setNumber(count);
+//
+//
+//            }
+//        });
 
     }
 }

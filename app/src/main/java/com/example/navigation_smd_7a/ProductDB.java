@@ -62,12 +62,21 @@ public class ProductDB {
         cv.put(KEY_PRICE, price);
         return db.update(DATABASE_TABLE_NAME, cv, KEY_ID+"=?", new String[]{id+""});
     }
+    public int updateStatus(int id, String status) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_STATUS, status);  // Assuming KEY_STATUS is defined in your class
+
+        // Update the order status where the order ID matches the provided id
+        return db.update(DATABASE_TABLE_NAME, cv, KEY_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
 
     public ArrayList<Product> fetchProducts()
     {
         SQLiteDatabase readDb = dbHelper.getReadableDatabase();
         ArrayList<Product> products = new ArrayList<>();
-        String []columns = new String[]{KEY_ID, KEY_TITLE, KEY_DATE, KEY_PRICE};
+        String []columns = new String[]{KEY_ID, KEY_TITLE, KEY_DATE, KEY_PRICE,KEY_STATUS};
 
         Cursor cursor = readDb.query(DATABASE_TABLE_NAME, columns, null, null, null, null, null);
         if(cursor!=null) {
@@ -76,9 +85,10 @@ public class ProductDB {
             int title_index = cursor.getColumnIndex(KEY_TITLE);
             int date_index = cursor.getColumnIndex(KEY_DATE);
             int price_index = cursor.getColumnIndex(KEY_PRICE);
+            int status_index = cursor.getColumnIndex(KEY_STATUS);
             while (cursor.moveToNext()) {
                 Product p = new Product(cursor.getInt(id_index), cursor.getString(title_index), cursor.getString(date_index),
-                        cursor.getInt(price_index), "");
+                        cursor.getInt(price_index), cursor.getString(status_index));
                 products.add(p);
             }
             cursor.close();

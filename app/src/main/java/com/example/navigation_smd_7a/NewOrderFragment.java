@@ -7,10 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -84,9 +86,15 @@ public class NewOrderFragment extends Fragment {
         ProductDB productDB = new ProductDB(context);
         productDB.open();
         ArrayList<Product> products = productDB.fetchProducts();
-        productDB.close();
 
-        ProductAdapter adapter = new ProductAdapter(context, R.layout.product_item_design, products);
+        productDB.close();
+        ArrayList<Product> new_orders= new ArrayList<>();
+        for(int i=0;i<products.size();i++){
+            if(products.get(i).getStatus().equals("new")){
+                new_orders.add(products.get(i));
+            }
+        }
+        ProductAdapter adapter = new ProductAdapter(context, R.layout.product_item_design, new_orders);
         lvNewOrderList.setAdapter(adapter);
     }
 }
