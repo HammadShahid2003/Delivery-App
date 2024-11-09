@@ -92,6 +92,8 @@ public class ScheduleFragment extends Fragment {
         }
 
 
+
+
         ProductAdapter adapter = new ProductAdapter(context, R.layout.product_item_design,schedule_orders);
         lvNewOrderList.setAdapter(adapter);
     }

@@ -35,6 +35,7 @@ public class ProductAdapter extends ArrayAdapter<Product> {
         ImageView ivEdit = v.findViewById(R.id.ivEdit);
         ImageView ivDelete = v.findViewById(R.id.ivDelete);
         TextView tvPrice=v.findViewById(R.id.tvProductPrice);
+
         Product p = getItem(position);
 
             tvTitle.setText(p.getTitle());
